@@ -1,0 +1,188 @@
+<?php
+/*
+mysql是关联性数据库
+sql是结构化查询语句
+
+Mysql基本命令:
+1.登录mysql
+mysql -h localhost -uroot -p123
+如果是在cmd里面，先找盘 E: 
+cd E:\MySQL\bin  (cd空格后写MySQL中bin的路径)
+
+2.查看数据库和创建数据库
+show databases;  create database student；
+
+
+3.切换到test数据库
+use test;
+
+
+4.查看库中所有表
+show tables;
+
+5.查看user表中字段结构，或创建信息
+desc user; 或show create table user;
+
+
+6.查看user表中数据
+select * from user;
+
+7.退出mysql客户端
+exit;或者quit 或者ctrl+c
+
+8.创建表(auto_increment和 primary key不可单独分开使用)
+create table tab8(id int not null auto_increment primary key,
+name varchar(66) not null default "zhang",
+age int not null default 18,
+sex enum('man','woman'),
+tel varchar(11));
+
+9.字段中插入信息(如果省略了前面的id字段，id在为主键的情况下，后面values设置为null，主键才会自动生成排序，否者)
+insert into tab8(name,age,sex,tel) values('zhang',18,'man',11111111111),('li',18,'w
+oman',2222222222);
+
+insert into tab8 values(null,'zhang',18,'man',11111111111),(null,'li',18,'woman',22
+22222222);
+
+
+10.删除表
+drop table user;
+
+
+11.删除库
+drop database student;
+
+12.删除数据
+delete from user where id=1;
+
+13.修改数据
+update user set age=30 where id=2;
+update tab8 set name='wan',age="20",sex="man" where id=1;
+
+14.查看表格信息
+select * from user;
+
+
+修改表格结构（增加表格字段(列)first）：增加字段weight在phone之后,如有默认值则已经有的其它数据在weight区列，会自动添加上默认值，如没默认值则为空（不是null） alter...add...
+ alter table tab6 add weight varchar(100) not null default '150' after phone;
+
+
+ 修改表格结构（增加表格字段(列)after）：增加字段放到position之后 alter...add...
+alter table tab6 add position varchar(100) not null default "officer" first;
+
+
+修改表格结构（删除表格字段）：删除tab6表格中的phone字段列
+alter table tab6 drop phone;
+
+
+修改表格结构（重命名表格）：重命名表格名tab6为wc_rename
+alter table tab6 rename wc_rename;
+
+
+修改表格结构（更改表格字段名）：更改tab7的表格字段，把字段列position 改成vacancy，如果加默认值，之后添加的值才会改，之前的没影响
+alter table tab7 change position vacancy varchar(10) not null default 'office';
+
+
+
+
+数据库的库表结构操作
+	库操作
+		查看服务器下的库  ：  show  databases ；
+		创建库  ：  create  database  库名  
+		选择库  ： use  选择的库
+		删除库  ：  drop  database  库名
+	表操作
+		查看库下所有的表  ：  show   tables
+		创建表  ：  create  table  表名（字段1  类型   属性，字段2  类型  属性，…………）；
+		引入 auto_increment 和  primary  key
+		查看表的结构  ：  desc   表名
+		查看创建表的信息  ：  show  create  table  表名
+		删除表  ：  drop   table   表名
+	操作表结构
+		修改表名  ：  alter  table  表名  rename  新表名；
+		添加字段  ：  alter  table  表名  add  列名  类型  属性 ；     first/after
+		修改字段  ：  alter  table   表名   change  旧列名  新列名  数据类型  属性  
+		删除字段  ：  alter   table  表名  drop  字段名
+
+
+
+数据操作语言
+	添加数据
+		insert  into  表名（字段1，字段2…………）value  （值1，值2…………）
+		insert  into  表名 value  （值1，值2…………）
+		insert  into  表名（字段1，字段2…………）value  （值1，值2…………），（值1，值2…………），（值1，值2…………）
+		insert  into  表名  set  字段1 = 值1，字段2 = 值2
+	查询数据
+		select  *  from  表名（暂时只讲解这一条）
+	修改数据
+		update  表名  set  修改列 = 值
+		update  表名  set  修改列 = 值  where   所在列  =  值
+	删除数据
+		delete  from  表名  where   列 = 值
+		delete  from  表名
+
+
+
+
+
+数据类型及字段属性
+	数值型（值中可加引号，字符串中的数字也可不加引号''）
+		整数型
+			tinyint  ： -128-127
+			smallint  ：  -32768-32767
+			mediumint  ： -8388608-8388607
+			int  ：  2147483648-2147483647
+			bigint  ：  太大了  不写了
+		小数型  小数都是两个参数
+			浮点型
+				float
+				doubel
+			定点型
+				decimal
+	字符串型
+		enum
+		text
+		varchar
+		char
+	时间型
+		year  ：  yyyy
+		timestamp  ：  yymmddhhiiss
+		time  ：  hh-ii-ss
+		date  ：  yy-mm-dd
+		datetime  ：  yy-mm-dd hh-ii-ss
+	空值
+		null
+	
+
+	字段属性
+		null
+		not  null
+		unsigned(无符号，不能为负数)
+		zerofill （用0填补）例如设置了int(6),数字不到6位的在前面填补上0
+		auto_increment
+		default （默认一个值）
+
+
+
+
+
+set names gbk;设置字符集
+
+表引擎:
+1.myisam(3个文件)
+2.innodb(2个文件)
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+?>
