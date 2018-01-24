@@ -67,7 +67,7 @@ select * from user;
  alter table tab6 add weight varchar(100) not null default '150' after phone;
 
 
- 修改表格结构（增加表格字段(列)after）：增加字段放到position之后 alter...add...
+ 修改表格结构（增加表格字段(列)after）：增加字段放到position之后 alter...add... 如果增加的是int类型，则之前的行都会变成默认值，没默认值的变为0，如增加的是字符串类型的字段，前面的行都为空
 alter table tab6 add position varchar(100) not null default "officer" first;
 
 
@@ -178,6 +178,56 @@ set names gbk;设置字符集
 
 
 
+
+
+/*
+
+
+批量删除表:
+DROP TABLE `t1`, `t2`, `t3`, `t4`, `t5`, `t6`, `t7`, `t8`, `t9`, `user`;
+
+表名反引号作用:
+可以有效的屏蔽关键字问题(表名和字段名不允许使用关键字)
+
+改字段的属性
+alter table t1 modify username varchar(50) not null;
+
+
+
+
+
+
+
+
+
+*****************表查询：
+
+
+逻辑查询：
+ select * from tab9 where id=2 or id=3 or id=4;//逻辑或，也可以用||
+
+ select * from tab9 where id in (2,3,4);//在id为2,3,4中的所有的，结果类似上面的逻辑或
+
+ select * from tab9 where name='zhang' and age=18;//逻辑与查询，也可以用&&
+
+
+
+模糊查询：
+select * from tab9 where name like 'wa_';//下划线匹配任意一位字符，如果匹配2位就写2个下划线，可匹配前面或者后面，或者中间
+
+select name from tab9 where name like "%n%";//表示n前后匹配若干位字符，也可是0位，如果只写% 表示匹配若干位字符显示所有的。如果不加%，like和=等号是一样的
+
+排序查询：
+select * from tab9 order by id desc;//通过id倒序排列descend
+select * from tab9 order by id asc;//通过id倒序排列ascend
+
+select * from tab9 id limit 0,5;//字段id可有可无，下标从0开始，5是长度
+select * from tab9 order by id desc limit 0,5;
+select * from tab9 order by id asc limit 1,5;//下标从0开始，第一个开始截取5个
+
+
+
+*/
 
 
 
