@@ -39,3 +39,22 @@ const PASSWORD='root';
 $link=mysqli_connect(HOST,USER,PASSWORD) or die('连接失败');
 mysqli_select_db($link,'php122') or die('没有找到数据库');
 mysqli_query($link,'set names utf8');
+
+
+
+
+//$sql="select * from `stu` order by `id` desc ";
+$sql="select * from `stu` where `id`=3";
+$query=mysqli_query($link,$sql);
+//$assoc=mysqli_fetch_assoc($query);//关联数组
+//print_r($assoc);
+
+//$array=mysqli_fetch_array($query);//索引和关联
+//print_r($array);
+
+//$row=mysqli_fetch_row($query);//索引数组
+//print_r($row);
+
+$object=mysqli_fetch_object($query);//取一条做对象数组
+print_r($object);
+
