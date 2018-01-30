@@ -1,0 +1,124 @@
+//创建视图表,as后面可以接任何查询语句
+create view view_score as select stu.name, scores.html,scores.css from stu,sc
+ores where stu.id=scores.pid;
+
+//查询视图的结构
+ show create view view_score;
+ //查询视图，跟一般查询一帮
+ select * from view_score;
+
+
+ //在视图中对数据的增删改查与在表中都一样
+
+ //删除视图
+ drop view view_score;
+
+ 视图是一张虚拟的表，不占用物理内存
+ 视图不存放数据，数据只存在基表中，但是他们发生变化都会互相影响
+ 性能差  ：  查询的效率偏低，每次查询是都要转换
+ 修改限制  ：  对于复杂视图来说（多表查询）修改是非常麻烦的
+ 
+ 、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、。。。。。、、。。。。。...
+ //转账事物处理方法一
+ <?php
+header('Content-type:text/html;charset=utf-8');
+/**
+ * 样  ：  参加婚礼   发红包的全过程   震惊了13亿人
+ */
+$conn = mysqli_connect('localhost','root','123','php1218') or die('数据库连接不上！！！');
+mysqli_query($conn,'set names utf8');
+//关闭数据库的自动提交
+mysqli_autocommit($conn,false);
+$money = 5000;
+$result = false;
+//文阳转给我钱
+$sql = "update `hongbao` set `money` = `money`- $money where id = 2";
+$query = mysqli_query($conn,$sql);
+//$aff = mysqli_affected_rows($query);
+//我收到文阳的钱
+if (!$query)
+{
+    echo '<h3 style="color: red">转账失败！！！文阳钱都没转过来  不够意思！！！</h3>';
+    echo '<br />';
+    $result = false;
+}
+else
+{
+    $sql = "update `hongbao` set `money` = `money`+ $money where id = 1";
+    $query = mysqli_query($conn,$sql);
+    if (!$query)
+    {
+        echo '<h3 style="color: red">转账失败！！！我这边没收到钱   文阳不够意思！！！</h3>';
+        echo '<br />';
+        $result = false;
+    }
+    else
+    {
+        $result = true;
+    }
+}
+
+//判断  如果没有错误   那么就提交   有错误回滚
+
+if ($result == true)
+{
+    //提交
+    mysqli_commit($conn);
+    echo '<h1 style="color: green">转账成功！！！ 够意思</h1>';
+}
+else
+{
+    //回滚
+    //mysqli_rollback($conn);
+    echo '<h1 style="color: red">转账失败！！！  不讲究</h1>';
+}
+mysqli_close($conn);
+?>
+
+。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。
+ //转账事物处理方法二
+ <?php
+header("content-type:text/html;charset=utf-8");
+$link=mysqli_connect("localhost",'root','root','demo') or die("数据库链接失败");
+mysqli_query($link,'set names utf8');
+
+//数据库事物
+mysqli_autocommit($link,false);//关闭自动提交功能
+$money=5000;
+$sql="update `hongbao` set `money`=`money`-$money where `id`=1";
+$query=mysqli_query($link,$sql);
+//var_dump($query);
+if(!$query){
+	echo '转账失败';
+	//mysqli_rollback($link);
+
+}else{
+
+	$sql="update `hongbao` set `money`=`money`+$money where `id`=2";
+	$query=mysqli_query($link,$sql);
+	if(!$query){
+		echo "收款失败了";
+
+	}else{
+		echo "转账和收款都成功了";
+		mysqli_commit($link);//代码执行成功后，再提交数据库
+	}
+}
+mysqli_close($link);
+
+?>
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ //数据库备份，也可以从mysql后台备份，备份出来的文件一样，备份库或者表都是一样的方式
+E:\>mysqldump -u root -p demo hongbao >E:\WWW\hong.sql //备份表，如备份多个用,逗号隔开，后面路径是绝对路径
+Enter password: ****
+E:\>mysqldump -u root -p demo>E:\WWW\demo.sql//备份库
+Enter password: ****
+
+使用SQL语句进行备份 ：  mysqldump  -u root  -p  数据库名  数据表名1、表名2   密码  >  路径
+
+使用SQL语句进行还原  ：  mysql  -u  root  -p  密码  数据库名  <  路径
+E:\>mysql -u root -p demo<E:\WWW\hong.sql//还原表
+Enter password: ****
+E:\>mysql -u root -p demo<E:\WWW\demo.sql//还原库
+Enter password: ****
