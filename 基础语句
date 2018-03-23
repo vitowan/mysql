@@ -6,8 +6,10 @@ sql是结构化查询语句
 Mysql基本命令:
 1.登录mysql
 mysql -h localhost -uroot -p123
-如果是在cmd里面，先找盘 E: 
-cd E:\MySQL\bin  (cd空格后写MySQL中bin的路径)
+如果是在cmd里面，
+先找盘，
+先直接输入 E:
+之后输入cd E:\MySQL\bin  (cd空格后写MySQL中bin的路径)
 
 2.查看数据库和创建数据库
 show databases;  create database student；
