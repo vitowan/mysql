@@ -1,0 +1,150 @@
+MySQL 赋予用户权限命令的简单格式可概括为：grant 权限 on 数据库对象 to 用户
+
+一、grant 普通数据用户，查询、插入、更新、删除 数据库中所有表数据的权利。
+
+grant select on testdb.* to common_user@'%'
+grant insert on testdb.* to common_user@'%'
+grant update on testdb.* to common_user@'%'
+grant delete on testdb.* to common_user@'%'
+或者，用一条 MySQL 命令来替代：grant select, insert, update, delete on testdb.* to common_user@'%'
+
+
+二、grant 数据库开发人员，创建表、索引、视图、存储过程、函数。。。等权限。
+
+grant 创建、修改、删除 MySQL 数据表结构权限。
+
+grant create on testdb.* to developer@'192.168.0.%';
+grant alter on testdb.* to developer@'192.168.0.%';
+grant drop on testdb.* to developer@'192.168.0.%';
+
+grant 操作 MySQL 外键权限。
+
+grant references on testdb.* to developer@'192.168.0.%';
+ 
+grant 操作 MySQL 临时表权限。
+
+grant create temporary tables on testdb.* to developer@'192.168.0.%';
+
+grant 操作 MySQL 索引权限。
+
+grant index on testdb.* to developer@'192.168.0.%';
+ 
+grant 操作 MySQL 视图、查看视图源代码 权限。
+
+grant create view on testdb.* to developer@'192.168.0.%';
+grant show view on testdb.* to developer@'192.168.0.%';
+ 
+grant 操作 MySQL 存储过程、函数 权限。
+
+grant create routine on testdb.* to developer@'192.168.0.%'; -- now, can show procedure status
+grant alter routine on testdb.* to developer@'192.168.0.%'; -- now, you can drop a procedure
+grant execute on testdb.* to developer@'192.168.0.%';
+
+
+
+三、grant 普通 DBA 管理某个 MySQL 数据库的权限。
+
+grant all privileges on testdb to dba@'localhost'
+其中，关键字 “privileges” 可以省略。
+
+
+四、grant 高级 DBA 管理 MySQL 中所有数据库的权限。
+
+grant all on *.* to dba@'localhost'
+
+
+五、MySQL grant 权限，分别可以作用在多个层次上。
+
+1. grant 作用在整个 MySQL 服务器上：
+
+grant select on *.* to dba@localhost; -- dba 可以查询 MySQL 中所有数据库中的表。
+grant all on *.* to dba@localhost; -- dba 可以管理 MySQL 中的所有数据库
+ 
+
+2. grant 作用在单个数据库上：
+
+grant select on testdb.* to dba@localhost; -- dba 可以查询 testdb 中的表。
+ 
+
+3. grant 作用在单个数据表上：
+
+grant select, insert, update, delete on testdb.orders to dba@localhost;
+ 
+
+这里在给一个用户授权多张表时，可以多次执行以上语句。例如：
+
+grant select(user_id,username) on smp.users to mo_user@'%' identified by '123345';
+grant select on smp.mo_sms to mo_user@'%' identified by '123345';
+
+4. grant 作用在表中的列上：
+
+grant select(id, se, rank) on testdb.apache_log to dba@localhost;
+ 
+
+5. grant 作用在存储过程、函数上：
+
+grant execute on procedure testdb.pr_add to 'dba'@'localhost'
+grant execute on function testdb.fn_add to 'dba'@'localhost'
+
+六、查看 MySQL 用户权限
+
+查看当前用户（自己）权限：
+
+show grants;
+ 
+
+查看其他 MySQL 用户权限：
+
+show grants for dba@localhost;
+
+七、撤销已经赋予给 MySQL 用户权限的权限。
+
+revoke 跟 grant 的语法差不多，只需要把关键字 “to” 换成 “from” 即可：
+
+grant all on *.* to dba@localhost;
+revoke all on *.* from dba@localhost;
+
+
+
+
+
+
+、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、
+
+通配符说明：172.18.10.%（IP地址为172.18.10段的所有IP地址都可以访问）
+
+
+****************888通过CREATE USER命令进行创建用户
+
+脚本：CREATE USER 'username@host' [IDENTIFIED BY 'PASSWORD'] 其中密码是可选项；
+
+例子：CREATE USER 'john@192.168.189.71' IDENTIFIED BY "123";
+
+CREATE USER 'john@192.168.189.%' IDENTIFIED BY "123";
+
+CREATE USER 'john@' ;
+
+说明：该方法创建出来的用户只有连接数据库的权限，需要后续继续授权；
+
+注意：用户与@后主机地址是一体的，用一个分号连接，否则会报错，ERROR 1396 (HY000): Operation CREATE USER failed for 'remote'@'%'
+
+
+*************************8当数据库存在用户的时候GRANT会对用户进行授权，但当数据库不存在该用户的时候，就会创建相应的用户并进行授权
+grant all privileges on test.* to joe@192.168.10.1 identified by '123';
+说明：给主机为192.168.10.1的用户john分配可对数据库test所有表进行所有操作的权限，并设定口令为123。
+
+mysql>grant all privileges on *.* to john@192.168.10.1 identified by '123';
+说明：给主机为192.168.10.1的用户john分配可对所有数据库的所有表进行所有操作的权限，并设定口令为123。
+
+mysql>grant all privileges on *.* to john@localhost identified by '123';
+说明：用户john分配可对所有数据库的所有表进行所有操作的权限，并设定口令为123。
+
+五、完成用户的创建后，请记得刷新系统权限表；
+
+mysql>flush privileges;
+
+
+*********************设置主从复制账户
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'::1' IDENTIFIED BY '123456'; 
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'127.0.0.1' IDENTIFIED BY '123456'; 
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'localhost' IDENTIFIED BY '123456';
