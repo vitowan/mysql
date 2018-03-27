@@ -113,6 +113,16 @@ redis.conf 配置项说明如下：
     activerehashing yes
 30. 指定包含其它的配置文件，可以在同一主机上多个Redis实例之间使用同一份配置文件，而同时各个实例又拥有自己的特定配置文件
     include /path/to/local.conf
+，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，
+
+
+*************php安装redis扩展
+下载对应的redis扩展（于php版本对应）
+找到php_redis.dll,放到php\php-7.2.1\ext里面，后重启Apache（可以进入bin里面后，用命令框打开 httpd restart）
+
+在php.ini更改以下内容：
+更改扩展的路径：extension_dir = "E:\wamp\php\php-7.2.1\ext"
+在extension添加扩展的地方，添加上redis的信息extension=redis，并打开被注释的相关扩展
 
 
 、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、
