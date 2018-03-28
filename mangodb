@@ -1,0 +1,272 @@
+1.MongoDB的文档(document)，相当于关系型数据库中的一行记录
+文档是MongoDB的核心概念，是数据的基本单元，非常类似于关系数据库中的行。在MongoDB中，文档表示为键值对的一个有序集。MongoDB使用Javascript shell，文档的表示一般使用Javascript里面的对象的样式来标记
+
+
+说明：
+文档区分大小写和数据类型，所以以下两组文档是不同的：
+MongoDB的文档不能有重复的键
+2.多个文档组成一个集合(collection)，相当于关系型数据中的表
+3.多个集合，逻辑上组织在一起，就是数据库(database)
+4.一个运行的MongoDB Server支持多个数据库
+
+*************************安装与配置
+下载：
+MongoDB的官方下载网站是：http://www.mongodb.org/downloads，可以去上面下载最新的安装程序。在下载页面可以看到，它对操作系统支持和全面，而且都有各自的32位和64位版本。
+安装：
+MongoDB文件夹下bin目录中的工具
+
+Bsondump   读取BSON格式的回滚文件内容
+Mongo		Mongo数据库的Shell
+Mongod		核心数据库服务
+Mongodump  数据备份工具
+Mongoexport 数据导出工具
+Mongofiles   操作GridFS对象中的文件
+Mongoimport 导入工具
+Mongooplog  从另一个mongodb实例中更新oplog
+Mongoperf   检查磁盘I/O性能
+Mongorestore 数据库备份恢复工具
+Mongos      数据库分片进程
+Mongosniff   实时跟踪数据库的活动
+Mongostat    返回数据库操作的内容
+Mongotop    跟踪报告MongoDB的读写活动
+
+MongoDB需要数据目录来存储所有的数据，其默认的数据目录为\data\db ，可以通过mongod.exe --dbpath命令来指定MongoDB的数据目录。
+
+1、在D盘创建 D:\MongoDB\data\db
+4、启动管理员身份的命令窗口并切换到 D:\MongoDB\bin
+5、启动mongo  mongod.exe --dbpath D:\MongoDB\data\db
+6、安装 mongodb 服务
+在data目录下创建 log 日志文件目录，在D:\mongoDB目录下创建mongo.conf文件，填写以下内容：
+systemLog:
+    destination: file
+    path: D:\mongoDB\data\log\mongod.log
+storage:
+    dbPath: D:\mongoDB\data\db
+    
+执行mongod.exe --config D:\MongoDB\mongo.conf  --install
+安装成功后在服务窗口启动 MongoDB服务
+
+在命令框输入：mongo.exe可在客户端执行MongoDB
+
+
+其他命令
+-h [--help] 帮助
+--install  		安装
+--remove		卸载
+--reinstall		重新安装
+--serviceName	Windows服务的名称
+--port arg    	指定端口号-默认为27017
+--logpath  		指定日志文件目录
+
+
+
+
+六、简单使用
+启动数据库
+获得当前数据库名称 db.getName();
+创建数据库 即用即创建 use dbname
+查看数据状态 db.getStats();
+简单运算
+查看数据库相关帮助信息 db.help();
+停止数据库 db.stopServer();
+查看当前数据库下所有集合 db.getCollectionNames();
+在集合级别查看帮助信息
+
+
+
+
+
+
+
+
+**************************mongodb
+
+show dbs;展示所有的数据库
+---------------------------------------
+ use run   转换数据库run，如果没此库，则创建此库，创建时，如果show dbs还不会显示它，因为没数
+
+据
+
+db.createCollection(test1);创建集合test1
+
+show collections;展示当前所在数据库的所有的集合
+
+db.test2.find() 展示所有的集合test2中的信息
+
+db.getName()//得到当前所在的数据库名字
+----------------------------------------------------
+**********************添加
+
+
+db.test1.save({'name','zhangsan'});储存数据到集合test1，或者用db.test1.insert()储存数据
+
+
+db.run.insert({'name':'wang'}) 插入数据到run集合，如果没run集合，会默认建个直接建个集合run，
+
+并插入了数据
+
+插入数据的其它写法：
+
+> var m = db.t1.insert({name:'zhao',age:18})//跟insertOne的方法一样
+> m
+WriteResult({ "nInserted" : 1 })
+
+
+
+> db.t1.insertMany([{name:'zhao',age:18},{name:'tan',age:19}]);//插入多条，用[]括起来，也可
+
+以跟上面一样，先赋值变量再调用
+{
+        "acknowledged" : true,
+        "insertedIds" : [
+                ObjectId("5abb561f3ccbe4f5a2d33a2d"),
+                ObjectId("5abb561f3ccbe4f5a2d33a2e")
+        ]
+}
+
+
+
+也可以先设置变量，再插入，如下
+ c={'name':'li'}
+ d={'name':'xia'}
+{ "name" : "xia" }
+db.test2.insert(c)
+db.test2.save(d)
+-----------------------------------------------------------------------------------------
+
+
+for(var i=1;i<3;i++){db.test2.save({i:i,name:i})} //如果变量是键名，则不解析，同一行的2个键
+
+名不能一样，否者会被后面的覆盖
+
+{ "_id" : ObjectId("5abb53203ccbe4f5a2d33a29"), "i" : 1, "name" : 1 }
+{ "_id" : ObjectId("5abb53203ccbe4f5a2d33a2a"), "i" : 2, "name" : 2 }  
+------------------------------------------------
+
+*************更改
+
+db.test2.update({"_id" : ObjectId("5abb53203ccbe4f5a2d33a2a")},{$set:{age:18}}）//把age变成
+
+18，如果没age字段，则添加age字段
+
+ db.test2.update({"_id" : ObjectId("5abb53203ccbe4f5a2d33a2a")},{name:111})//如果不加$set则
+
+是清除了之前所有的信息，重新添加的新信息
+
+db.test2.update({"_id" : ObjectId("5abb53203ccbe4f5a2d33a21")},{name:111},{ups
+ert:true}) 如果修改的对应的id文档不存在，则自动创建一个
+
+ db.test2.update({"_id" : ObjectId("5abb53203ccbe4f5a2d33a29")},{$unset:{i:1}})//删除对应id
+
+中，字段为{i:1}
+
+多个条件匹配时mongo默认只修改第一条可通过multi 参数设置例如下：
+
+db.test2.update({name:111},{age:19},{muti:true})//如果有多个相同的name值，则只修改第一个
+
+db.test2.update({"_id" : ObjectId("5abb53203ccbe4f5a2d33a2a")},{$inc:{age:21}}//把对应id的
+
+age值增加21
+
+_id 不可以改，但在添加时可以设置_id为一般数字
+
+ db.test2.update({'_id':11},{$rename:{name:'family'}});//更改对应id的字段名把name改为family
+
+
+ db.test2.update({'_id':11},{$push:{color:1}})//向对应id的行中加上color数组，如果已经有数组
+
+，是添加
+
+ db.test2.update({'_id':11},{$push:{color:{$each:[2,3,4,5,6,7]}}})//数组中一次添加多个值
+
+ db.test2.update({'_id':11},{$pull:{color:6}})//删除数组中一个元素
+
+db.test2.update({'_id':11},{$pull:{color:{$in:[1,8]}}})//批量删除数组的值
+
+db.test2.update({'_id':11},{$pullAll:{color:[1,3]}})//也是批量删除，效果跟$in上面的一样
+
+
+********************删除
+
+db.test2.remove({name:'wang'});//删除name为wang的
+
+db.test2.remove({name:'xia'},{justOne:true});//删除name值为xia中的第一条信息
+
+db.test2.deleteOne({age:80});//删除一条，根justOne效果一样
+
+db.test2.deleteMany({i:'name'})；//效果跟remove一样可以删除多条的
+
+db.test2.deleteMany({});删除集合内所有文档
+
+db.t1.renameCollection('tt')//集合名字从t1变成tt
+
+db.test2.drop()；//删除集合test2
+
+
+
+
+**************************查询
+ db.tt.findOne();//只获得tt数据中的第一条
+ db.tt.find().limit(3)//获得前3个
+db.tt.find().sort({age:1});//以年龄为升序排列
+db.tt.find().sort({age:-1});//以年龄为降序排列
+
+
+var cursor=db.tt.find();
+while(cursor.hasNext()) printjson(cursor.next()) //while循环打印出所有的值
+
+db.tt.find().forEach(printjson)//forEach循环，跟while循环结果一样
+
+ var arr=db.tt.find().toArray();
+ arr[1]//转化为数组再一个个取值
+
+db.tt.find({name:'tan'})//取对应的name的数据
+
+ db.tt.find({'name':'tan',age:22})//同时满足name和age的数据
+
+db.tt.find({$and:[{name:'zhao'},{age:18}]})//跟上面效果一样
+
+db.tt.find({name:'tan'},{age:22});//两者中任意一个成立
+
+db.tt.find({$or:[{name:'zhao'},{name:'tan'}]})//两者中任意一个成立
+
+使用比较参数 $gt 大于，$lt 小于,$gte 大于等于 ，$lte 小于等于，$ne不等于，例如下：
+ db.tt.find({age:{$gt:18}})
+ db.tt.find({age:{$gte:18}})
+ db.tt.find({age:{$ne:18}})
+
+db.tt.find({name:{$exists:true}})//把带有name字段的数据找出来
+db.tt.find({name:{$exists:false}})//跟上面相反
+
+db.tt.find({name:/zhao|apple/})正则把复合条件的找出来
+
+db.tt.find({color:{$size:6}})//找到数据里面有数组，且内部元素个数为6个的
+
+db.tt.find({color:{$all:[2,3]}})//找到数据中有数组，且元素中有2和3的
+
+db.tt.find({color:{$in:[2,3]}})//找到数据中有数组，且元素中有2，或者3的
+
+db.tt.find({color:{$nin:[2,3]}})//找到数据中有数组，且元素中没有2和3的
+
+db.tt.find({age:{$gt:20,$lt:30},name:'wang'})//找到数据中年龄在20与30之间的，且名字为wang
+
+
+1 或 true 在返回的文档中包含字段。0 或者 false 排除该字段。_id为默认显示，除非使用_id:0显式
+
+的排除例如下：
+db.tt.find({name:'zhao'},{age:1})//显示了age和默认的_id字段
+db.tt.find({name:'zhao'},{age:1,_id:0})//只显示了age字段
+db.tt.find({name:'zhao'},{age:1,_id:0})//显示了除了age和_id的其它所有字段
+
+
+ db.tt.find({name:'zhao'},{color:{$slice:2}})//找到name为zhao的，如果有数组color取前2个值
+ db.tt.find({name:'zhao'},{color:{$slice:-2}})//同上，后2个
+ db.tt.find({name:'zhao'},{color:{$slice:[2,3]}})//同上，跳过前2个，获取3个
+ db.tt.find({name:'zhao'},{color:{$slice:[-4,3]}})//同上，从倒数第4个开始，取3个
+
+
+
+
+
+
+
