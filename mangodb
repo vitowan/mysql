@@ -208,6 +208,7 @@ db.test2.drop()；//删除集合test2
 **************************查询
  db.tt.findOne();//只获得tt数据中的第一条
  db.tt.find().limit(3)//获得前3个
+  db.tt.find().skip(4).limit(3)//跳过前4个，再找3个
 db.tt.find().sort({age:1});//以年龄为升序排列
 db.tt.find().sort({age:-1});//以年龄为降序排列
 
@@ -265,6 +266,43 @@ db.tt.find({name:'zhao'},{age:1,_id:0})//显示了除了age和_id的其它所有
  db.tt.find({name:'zhao'},{color:{$slice:[-4,3]}})//同上，从倒数第4个开始，取3个
 
 
+
+
+，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，
+
+创建一个root权限的管理员     'db':'admin'表示数据库为admin的，root在里面
+db.createUser({user:'ujiuye','pwd':'123456',roles:[{'role':'root','db':'admin'}]});
+ 
+开启认证 再配置文件内添加以下内容，放到mango的配置文件里面
+security:
+   authorization: enabled
+。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。
+查看用户信息
+ db.getUser('ujiuye')
+
+
+转换用户
+ db.auth('ujiuye','123456')
+
+
+root权限的管理添加了新用户，只读权限，只对test1数据库有权限
+ db.createUser({user:'user1',pwd:'123456',roles:[{role:'read',db:'test1'}]})
+
+
+在php链接mongodb：括号里分别是mongodb://用户名：密码@域名:端口号/用户所在的数据库
+$m=new MongoClient('mongodb://ujiuye:123456@www.123.com:27017/admin');
+var_dump($m);
+echo "<pre>";
+$database=$m->selectDB('test1');
+var_dump($database);
+$c=$database->tt->find();
+var_dump($c);
+//$result=$database->tt->insert(array('age'=>11111));
+
+
+foreach($c as $v){
+	var_dump($v);
+}
 
 
 
