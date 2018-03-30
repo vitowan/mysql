@@ -1,0 +1,99 @@
+二、Nginx安装配置
+到官网下载Windows版本，下载地址：http://nginx.org/en/download.html
+解压到磁盘任一目录
+修改配置文件：
+worker_processes 8;
+#Nginx进程数，建议设置为等于CPU总核心数
+worker_connections 65535;
+#单个进程最大连接数（最大连接数=连接数*进程数）
+client_header_buffer_size 32k; #上传文件大小限制
+large_client_header_buffers 4 64k; #设定请求缓
+client_max_body_size 8m; #设定请求缓
+autoindex on; #开启目录列表访问，合适下载服务器，默认关闭。
+tcp_nopush on; #防止网络阻塞
+tcp_nodelay on; #防止网络阻塞
+keepalive_timeout 120; #长连接超时时间，单位是秒
+gzip on; #开启gzip压缩输出
+gzip_min_length 1k; #最小压缩文件大小
+gzip_buffers 4 16k; #压缩缓冲区
+gzip_http_version 1.0; #压缩版本（默认1.1，前端如果是squid2.5请使用1.0）
+gzip_comp_level 2; #压缩等级
+更详细的模块参数请参考：http://wiki.Nginx.org/Main
+
+启动服务：
+直接运行Nginx.exe，缺点控制台窗口关闭，服务关闭。
+守护进程的方式启动：start Nginx.exe
+停止服务：Nginx -s stop
+重新加载配置：Nginx -s  reload
+
+三、Nginx之反向代理
+1.正向代理
+正向代理，也就是传说中的代理,他的工作原理就像一个跳板，简单的说，我是一个用户，我访问不了某网站，但是我能访问一个代理服务器，这个代理服务器呢，他能访问那个我不能访问的网站，于是我先连上代理服务器，告诉他我需要那个无法访问网站的内容，代理服务器去取回来，然后返回给我。从网站的角度，只在代理服务器来取内容的时候有一次记录，有时候并不知道是用户的请求，也隐藏了用户的资料，这取决于代理告不告诉网站。
+    结论就是，正向代理是一个位于客户端和原始服务器(origin server)之间的服务器，为了从原始服务器取得内容，客户端向代理发送一个请求并指定目标(原始服务器)，然后代理向原始服务器转交请求并将获得的内容返回给客户端。客户端必须要进行一些特别的设置才能使用正向代理。
+2.反向代理
+举例:    
+    例如用户访问 http://www.test.com/readme，但www.test.com上并不存在readme页面，他是偷偷从另外一台服务器上取回来，然后作为自己的内容返回用户，但用户并不知情。这里所提到的 www.test.com 这个域名对应的服务器就设置了反向代理功能。
+结论就是，反向代理正好相反，对于客户端而言它就像是原始服务器，并且客户端不需要进行任何特别的设置。客户端向反向代理的命名空间(name-space)中的内容发送普通请求，接着反向代理将判断向何处(原始服务器)转交请求，并将获得的内容返回给客户端，就像这些内容原本就是它自己的一样。
+3.两者之间的区别
+从用途上来讲：
+正向代理的典型用途是为在防火墙内的局域网客户端提供访问Internet的途径。正向代理还可以使用缓冲特性减少网络使用率。反向代理的典型用途是将防火墙后面的服务器提供给Internet用户访问。反向代理还可以为后端的多台服务器提供负载平衡，或为后端较慢的服务器提供缓冲服务。另外，反向代理还可以启用高级URL策略和管理技术，从而使处于不同web服务器系统的web页面同时存在于同一个URL空间下。
+从安全性来讲：
+正向代理允许客户端通过它访问任意网站并且隐藏客户端自身，因此你必须采取安全措施以确保仅为经过授权的客户端提供服务。反向代理对外都是透明的，访问者并不知道自己访问的是一个代理。
+
+
+4.Nginx配置反向代理(config的配置文件里面加入下面的链接，打开当前链接会显示下面的链接内容)
+location / {
+proxy_pass      http://192.168.18.101;
+}
+指令说明：proxy_pass
+语法：proxy_pass URL
+默认值：no 
+
+这个指令设置被代理服务器的地址和被映射的URI，地址可以使用主机名或IP加端口号的形式，例如：proxy_pass http://localhost:8000/uri/;
+
+
+四、Nginx之负载均衡
+大家可以知道，在网站发展初期，Nginx只代理了后端一台服务器，但由于我们网站名气大涨访问的人越来越多一台服务器实在是顶不住，于是我们加了多台服务器，那么多台服务器又怎么配置代理呢，我们这里以两台服务器为案例，为大家做演示。
+1.案例
+下面设定负载均衡的服务器列表。
+
+upstream test.net{
+ip_hash;
+server 192.168.10.13:80 weight 1;
+server 192.168.10.14:80 weight 2  down;
+}
+server {
+  location / {
+    proxy_pass  http://test.net;//调用上面test.net会访问上面的里面的链接，当访问当前链接时
+  }
+}
+
+upstream是Nginx的HTTP Upstream模块，这个模块通过一个简单的调度算法来实现客户端IP到后端服务器的负载均衡。在上面的设定中，通过upstream指令指定了一个负载均衡器的名称test.net。这个名称可以任意指定，在后面需要用到的地方直接调用即可。
+2.upstream 支持的负载均衡算法
+Nginx的负载均衡模块目前支持4种调度算法，下面进行分别介绍，其中后两项属于第三方调度算法。  
+轮询（默认）。每个请求按时间顺序逐一分配到不同的后端服务器，如果后端某台服务器宕机，故障系统被自动剔除，使用户访问不受影响。Weight 指定轮询权值，Weight值越大，分配到的访问机率越高，主要用于后端每个服务器性能不均的情况下。
+ip_hash。每个请求按访问IP的hash结果分配，这样来自同一个IP的访客固定访问一个后端服务器，有效解决了动态网页存在的session共享问题。
+fair。这是比上面两个更加智能的负载均衡算法。此种算法可以依据页面大小和加载时间长短智能地进行负载均衡，也就是根据后端服务器的响应时间来分配请求，响应时间短的优先分配。Nginx本身是不支持fair的，如果需要使用这种调度算法，必须下载Nginx的upstream_fair模块。
+url_hash。此方法按访问url的hash结果来分配请求，使每个url定向到同一个后端服务器，可以进一步提高后端缓存服务器的效率。Nginx本身是不支持url_hash的，如果需要使用这种调度算法，必须安装Nginx 的hash软件包。
+3.upstream 支持的状态参数
+在HTTP Upstream模块中，可以通过server指令指定后端服务器的IP地址和端口，同时还可以设定每个后端服务器在负载均衡调度中的状态。常用的状态有：      
+down，表示当前的server暂时不参与负载均衡。
+backup，预留的备份机器。当其他所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因此这台机器的压力最轻。
+max_fails，允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream 模块定义的错误。
+fail_timeout，在经历了max_fails次失败后，暂停服务的时间。max_fails可以和fail_timeout一起使用。
+注，当负载调度算法为ip_hash时，后端服务器在负载均衡调度中的状态不能是weight和backup。
+
+
+4.配置Nginx负载均衡
+upstream webservers {
+		server 10.10.13.36 weight=2;
+		server 192.168.182.128 weight=1;
+	}
+	server {
+		listen       80;
+		server_name  localhost;
+		location / {
+			proxy_pass      http://webservers;
+			proxy_set_header  X-Real-IP  $remote_addr;
+		}
+	}
