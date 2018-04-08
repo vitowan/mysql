@@ -235,6 +235,12 @@ select * from tab9 order by id asc limit 1,5;//下标从0开始，第一个开�
 
 
 
+**********批量添加，生成百万级数据
+insert into user(NAME,age,sex) select name,age,sex from user;
+
+************对数据批量更改
+update product set pro_name=CONCAT(id,'_',pro_name);
+
 
 
 ?>
